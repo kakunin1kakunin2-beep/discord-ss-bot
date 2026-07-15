@@ -52,7 +52,7 @@ client.on('messageCreate', async message => {
     return;
   }
 
-  console.log(`[SS Sync] ${displayName} → ${siteUsername}: ${images.length}枚を検出 (${new Date().toLocaleString('ja-JP')})`);
+  console.log(`[SS Sync] ${serverName || globalName || username} → ${siteUsername}: ${images.length}枚を検出 (${new Date().toLocaleString('ja-JP')})`);
 
   const fd = new FormData();
   fd.append('api_key',  SS_API_KEY);
