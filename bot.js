@@ -40,10 +40,15 @@ client.on('messageCreate', async message => {
   );
   if (images.length === 0) return;
 
-  const displayName = message.member?.displayName ?? message.author.displayName ?? message.author.username;
-  const siteUsername = USER_MAP[displayName];
+  const nickname    = message.member?.nickname ?? '';
+  const serverName  = message.member?.displayName ?? '';
+  const globalName  = message.author.globalName ?? '';
+  const username    = message.author.username ?? '';
+  console.log(`[名前確認] nickname="${nickname}" serverName="${serverName}" globalName="${globalName}" username="${username}"`);
+
+  const siteUsername = USER_MAP[serverName] ?? USER_MAP[globalName] ?? USER_MAP[nickname] ?? USER_MAP[username];
   if (!siteUsername) {
-    console.log(`[SS Sync] ${displayName}: マッピングなし、スキップ`);
+    console.log(`[SS Sync] マッピングなし、スキップ`);
     return;
   }
 
