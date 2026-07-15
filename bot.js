@@ -8,8 +8,13 @@ const {
   DISCORD_CHANNEL_ID,
   SS_API_URL,
   SS_API_KEY,
-  SS_USERNAME,
 } = process.env;
+
+// Discord表示名 → サイトユーザー名
+const USER_MAP = {
+  'あおと': 'aoto',
+  'なぎてゃ': 'なぎてゃ',
+};
 
 const client = new Client({
   intents: [
@@ -35,11 +40,18 @@ client.on('messageCreate', async message => {
   );
   if (images.length === 0) return;
 
-  console.log(`[SS Sync] ${message.author.username}: ${images.length}枚を検出 (${new Date().toLocaleString('ja-JP')})`);
+  const displayName = message.member?.displayName ?? message.author.displayName ?? message.author.username;
+  const siteUsername = USER_MAP[displayName];
+  if (!siteUsername) {
+    console.log(`[SS Sync] ${displayName}: マッピングなし、スキップ`);
+    return;
+  }
+
+  console.log(`[SS Sync] ${displayName} → ${siteUsername}: ${images.length}枚を検出 (${new Date().toLocaleString('ja-JP')})`);
 
   const fd = new FormData();
   fd.append('api_key',  SS_API_KEY);
-  fd.append('username', SS_USERNAME);
+  fd.append('username', siteUsername);
 
   let added = 0;
   for (const att of images.slice(0, 10)) {
