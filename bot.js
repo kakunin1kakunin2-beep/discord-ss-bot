@@ -10,11 +10,8 @@ const {
   SS_API_KEY,
 } = process.env;
 
-// Discord表示名 → サイトユーザー名
-const USER_MAP = {
-  'あおと': 'aoto',
-  'なぎてゃ': 'なぎてゃ',
-};
+// 投稿を許可するDiscordサーバー表示名（= サイトのユーザー名と同一）
+const ALLOWED = new Set(['あおと', 'なぎてゃ']);
 
 const client = new Client({
   intents: [
@@ -40,19 +37,13 @@ client.on('messageCreate', async message => {
   );
   if (images.length === 0) return;
 
-  const nickname    = message.member?.nickname ?? '';
-  const serverName  = message.member?.displayName ?? '';
-  const globalName  = message.author.globalName ?? '';
-  const username    = message.author.username ?? '';
-  console.log(`[名前確認] nickname="${nickname}" serverName="${serverName}" globalName="${globalName}" username="${username}"`);
-
-  const siteUsername = USER_MAP[serverName] ?? USER_MAP[globalName] ?? USER_MAP[nickname] ?? USER_MAP[username];
-  if (!siteUsername) {
-    console.log(`[SS Sync] マッピングなし、スキップ`);
+  const siteUsername = message.member?.displayName ?? message.author.globalName ?? message.author.username;
+  if (!ALLOWED.has(siteUsername)) {
+    console.log(`[SS Sync] ${siteUsername}: 対象外、スキップ`);
     return;
   }
 
-  console.log(`[SS Sync] ${serverName || globalName || username} → ${siteUsername}: ${images.length}枚を検出 (${new Date().toLocaleString('ja-JP')})`);
+  console.log(`[SS Sync] ${siteUsername}: ${images.length}枚を検出 (${new Date().toLocaleString('ja-JP')})`);
 
   const fd = new FormData();
   fd.append('api_key',  SS_API_KEY);
