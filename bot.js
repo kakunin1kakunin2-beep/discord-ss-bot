@@ -10,8 +10,12 @@ const {
   SS_API_KEY,
 } = process.env;
 
-// 投稿を許可するDiscordサーバー表示名（= サイトのユーザー名と同一）
-const ALLOWED = new Set(['あおと', 'なぎてゃ']);
+// Discord表示名 → サイトユーザー名のマッピング
+const USER_MAP = {
+  'あおと':  'あおと',
+  'なぎてゃ': 'なぎてゃ',
+  'なぎ':    'なぎてゃ',
+};
 
 const client = new Client({
   intents: [
@@ -37,13 +41,14 @@ client.on('messageCreate', async message => {
   );
   if (images.length === 0) return;
 
-  const siteUsername = message.member?.displayName ?? message.author.globalName ?? message.author.username;
-  if (!ALLOWED.has(siteUsername)) {
-    console.log(`[SS Sync] ${siteUsername}: 対象外、スキップ`);
+  const displayName  = message.member?.displayName ?? message.author.globalName ?? message.author.username;
+  const siteUsername = USER_MAP[displayName];
+  if (!siteUsername) {
+    console.log(`[SS Sync] ${displayName}: 対象外、スキップ`);
     return;
   }
 
-  console.log(`[SS Sync] ${siteUsername}: ${images.length}枚を検出 (${new Date().toLocaleString('ja-JP')})`);
+  console.log(`[SS Sync] ${displayName} → ${siteUsername}: ${images.length}枚を検出 (${new Date().toLocaleString('ja-JP')})`);
 
   const fd = new FormData();
   fd.append('api_key',  SS_API_KEY);
