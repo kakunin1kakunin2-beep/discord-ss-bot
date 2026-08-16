@@ -41,8 +41,10 @@ client.on('messageCreate', async message => {
   );
   if (images.length === 0) return;
 
-  const displayName  = message.member?.displayName ?? message.author.globalName ?? message.author.username;
+  const rawName     = message.member?.displayName ?? message.author.globalName ?? message.author.username ?? '';
+  const displayName = rawName.normalize('NFC').trim();
   const siteUsername = USER_MAP[displayName];
+  console.log(`[SS Sync] 受信: rawName="${rawName}" displayName="${displayName}" → siteUsername="${siteUsername ?? 'なし'}"`);
   if (!siteUsername) {
     console.log(`[SS Sync] ${displayName}: 対象外、スキップ`);
     return;
