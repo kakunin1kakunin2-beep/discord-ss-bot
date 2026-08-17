@@ -77,7 +77,11 @@ client.on('messageCreate', async message => {
 
   try {
     const res  = await fetch(SS_API_URL, { method: 'POST', body: fd, headers: fd.getHeaders() });
-    const json = await res.json();
+    console.log(`  HTTP ${res.status} ${res.statusText}`);
+    const text = await res.text();
+    console.log(`  レスポンス(先頭300文字): ${text.slice(0, 300)}`);
+    let json;
+    try { json = JSON.parse(text); } catch { console.error('  ❌ JSONパース失敗'); return; }
     if (json.success) {
       console.log(`  ✅ 投稿完了 ID:${json.id} (${added}枚)`);
       await message.react('📷').catch(() => {});
